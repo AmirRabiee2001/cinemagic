@@ -33,7 +33,7 @@ const App = () => {
       <ReactQueryDevtools />
 
       <GlobalStyles />
-      <BrowserRouter>
+      <BrowserRouter basename="/cinemagic">
         <Routes>
           <Route element={<AppLayout setSearchQuery={setSearchQuery} />}>
             <Route index element={<Home />} />
