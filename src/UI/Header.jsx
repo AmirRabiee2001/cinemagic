@@ -6,6 +6,9 @@ import { Link } from "react-router-dom";
 import useDarkMode from "../hooks/useDarkMode";
 import useLogout from "../hooks/useLogout";
 import Loading from "./Loading";
+import useModal from "../hooks/useModal";
+import Modal from "./Modal";
+import Button from "../styles/Button";
 
 const StyledHeader = styled.header`
   position: sticky;
@@ -53,6 +56,7 @@ const Header = ({ setSearchQuery }) => {
   const { isLoggedIn } = useUser();
   const [theme, setTheme] = useDarkMode();
   const { logout, isLoading } = useLogout();
+  const [isModalOpen, toggleModal] = useModal();
 
   if (isLoading) {
     return <Loading />;
@@ -60,9 +64,20 @@ const Header = ({ setSearchQuery }) => {
 
   return (
     <StyledHeader>
+      {isModalOpen && isLoggedIn && (
+        <Modal onClose={toggleModal}>
+          <h2>مطمئن هستید؟</h2>
+          <Button type="1" onClick={logout}>
+            خروج از حساب کاربری
+          </Button>
+          <Button type="2" onClick={toggleModal}>
+            انصراف
+          </Button>
+        </Modal>
+      )}
       <SearchBar setSearchQuery={setSearchQuery} />
       {isLoggedIn ? (
-        <IconWrapper onClick={logout}>
+        <IconWrapper onClick={toggleModal}>
           <span>خروج</span>
           <IoLogOut />
         </IconWrapper>

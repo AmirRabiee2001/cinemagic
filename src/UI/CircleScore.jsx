@@ -51,7 +51,7 @@ const CircularProgress = ({ score, link }) => {
 
   // Dynamic color based on score
   const getColor = (score) => {
-    if (score >= 8) return "#4ea351"; // Green for high scores
+    if (score >= 7) return "#4ea351"; // Green for high scores
     if (score >= 5) return "#bea14a"; // Yellow for medium scores
     return "#ae4840"; // Red for low scores
   };

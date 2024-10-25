@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import ReactDOM from "react-dom";
 
 const BackDrop = styled.div`
   position: fixed;
@@ -12,6 +13,8 @@ const BackDrop = styled.div`
 `;
 
 const Backdrop = ({ children }) => {
-  return <BackDrop>{children}</BackDrop>;
+  const target = document.getElementById("overlay");
+
+  return target ? ReactDOM.createPortal(<BackDrop>{children}</BackDrop>, target) : null;
 };
 export default Backdrop;

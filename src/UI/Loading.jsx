@@ -1,4 +1,3 @@
-import ReactDOM from "react-dom";
 import styled from "styled-components";
 import Backdrop from "./Backdrop";
 
@@ -44,15 +43,10 @@ export const Loader = styled.div`
 `;
 
 const Loading = () => {
-  // insert the loading overlay into another tag called over "overlay", separated from "root" tag
-  const target = document.getElementById("overlay");
-  return target
-    ? ReactDOM.createPortal(
-        <Backdrop>
-          <Loader />
-        </Backdrop>,
-        target
-      )
-    : null;
+  return (
+    <Backdrop>
+      <Loader />
+    </Backdrop>
+  );
 };
 export default Loading;

@@ -1,6 +1,5 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow, Pagination, Autoplay } from "swiper"; // Import Autoplay
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { ImageWrapper, PlaceholderCard } from "../styles/ImageWrapper";
 
@@ -10,20 +9,11 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "swiper/css/autoplay"; // Import autoplay styles (optional)
 
-import Loading from "../UI/Loading";
-
 import SwiperStyles from "../styles/SwiperStyles";
-import { getPopularMovies } from "../services/apiMovie";
 import useImageLoader from "../hooks/useImageLoader";
 
-const SlideShow = () => {
-  const { data, isLoading } = useQuery(["popularMovies"], getPopularMovies);
-
+const SlideShow = ({ data }) => {
   const { imageLoading, handleImageLoad } = useImageLoader();
-
-  if (isLoading) {
-    return <Loading />;
-  }
 
   return (
     <>

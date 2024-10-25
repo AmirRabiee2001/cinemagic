@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 import useLogin from "../hooks/useLogin";
-import Loading from "../UI/Loading";
+import { Loader } from "../UI/Loading";
 import { Link } from "react-router-dom";
 import useSignup from "../hooks/useSignup";
 import toast from "react-hot-toast";
@@ -15,6 +15,10 @@ const LoginPage = styled.div`
   width: 100vw;
 `;
 
+const LoaderButton = styled(Loader)`
+  color: white;
+`;
+
 const FormContainer = styled.div`
   background-color: rgba(200, 200, 200, 0.3);
   border-radius: 1rem;
@@ -24,6 +28,9 @@ const FormContainer = styled.div`
   gap: 3rem;
   max-width: 34rem;
   overflow-x: hidden;
+  h3 {
+    margin: auto;
+  }
   form {
     display: flex;
     flex-direction: column;
@@ -95,6 +102,10 @@ const FormGroup = styled.div`
   button {
     background-color: var(--color-primary);
     color: #fff;
+    max-height: 6rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: none;
     border-radius: 1rem;
     padding: 1rem;
@@ -142,30 +153,33 @@ const Login = () => {
     signup({ email, password });
   };
 
-  if (isLoginLoading || isSignupLoading) {
-    return <Loading />;
-  }
-
   return (
     <LoginPage>
+      <h1></h1>
       <FormContainer>
         <LoginForm onSubmit={loginFormHandler} isShown={formToggle}>
+          <h3>حساب ندارید؟ روی ثبت نام بزنید!</h3>
           <FormGroup>
             <label htmlFor="">ایمیل</label>
-            <input type="email" onChange={(e) => setEmail(e.target.value)} />
+            <input autoComplete="email" type="email" onChange={(e) => setEmail(e.target.value)} />
           </FormGroup>
           <FormGroup>
             <label htmlFor="">رمز عبور</label>
             <input type="password" onChange={(e) => setPassword(e.target.value)} />
           </FormGroup>
           <FormGroup>
-            <button type="submit">ورود</button>
+            <button type="submit" disabled={isLoginLoading}>
+              {isLoginLoading ? <LoaderButton /> : "ورود"}
+            </button>
           </FormGroup>
         </LoginForm>
 
         <SignUpForm onSubmit={signUpFormHandler} isShown={formToggle}>
+          <h3>ثبت نام</h3>
           <FormGroup>
-            <label htmlFor="">ایمیل</label>
+            <label autoComplete="email" htmlFor="">
+              ایمیل
+            </label>
             <input type="email" onChange={(e) => setEmail(e.target.value)} />
           </FormGroup>
           <FormGroup>
@@ -177,7 +191,9 @@ const Login = () => {
             <input type="password" onChange={(e) => setConfirmPassword(e.target.value)} />
           </FormGroup>
           <FormGroup>
-            <button type="submit">ایجاد حساب</button>
+            <button type="submit" disabled={isSignupLoading}>
+              {isSignupLoading ? <LoaderButton /> : "ایجاد حساب"}
+            </button>
           </FormGroup>
         </SignUpForm>
       </FormContainer>

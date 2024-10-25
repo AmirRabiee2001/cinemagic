@@ -26,7 +26,7 @@ A movie scraping and streaming application that allows users to search for movie
 
 This project is free for educational and personal use. However, you are required to adhere to the following terms:
 
-1. Non-commercial Use: You may not use this project for any commercial purposes without prior permission.
+1. Non-commercial Use: You may not use this project for any commercial purposes.
 
 2. Attribution: If you use any part of this project or its codebase in your own work, please provide proper attribution by linking back to this repository.
 

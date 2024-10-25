@@ -12,6 +12,7 @@ import Bookmarks from "./pages/Bookmarks";
 import Settings from "./pages/Settings";
 import Title from "./pages/Title";
 import Login from "./pages/Login";
+import Stream from "./pages/Stream";
 import Search from "./pages/Search";
 import { useState } from "react";
 import ProtectedRoute from "./UI/ProtectedRoute";
@@ -19,7 +20,7 @@ import ProtectedRoute from "./UI/ProtectedRoute";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 0,
+      staleTime: Infinity,
     },
   },
 });
@@ -56,6 +57,8 @@ const App = () => {
             <Route path="search" element={<Search searchQuery={searchQuery} />} />
             <Route path="title/:id" element={<Title />} />
           </Route>
+
+          <Route path="/stream" element={<Stream />} />
 
           <Route path="*" element={<NotFound />} />
           <Route path="login" element={<Login />} />

@@ -31,12 +31,18 @@ const StyledMovieCard = styled.div`
 const StyledMovieInfo = styled.div`
   margin: 0.5rem 0;
   text-align: center;
+  width: 100%;
 
   h3 {
     font-size: 1rem;
     font-weight: 600;
+    text-align: center;
     color: var(--color-text);
-    margin: 0.5rem 0;
+    direction: ltr;
+    margin: 0.5rem 1rem;
+    text-overflow: ellipsis;
+    width: 80%rem;
+    white-space: nowrap;
   }
 
   p {
@@ -58,6 +64,10 @@ const StyledMovieInfo = styled.div`
 
 const MovieCard = ({ id, title, year, image }) => {
   const { imageLoading, handleImageLoad } = useImageLoader();
+
+  if (!title && !image) {
+    return;
+  }
 
   return (
     <Link to={`/title/${id}`}>

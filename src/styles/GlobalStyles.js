@@ -6,6 +6,7 @@ const GlobalStyles = createGlobalStyle`
             --color-primary: #E63946;
             --color-background: #FFFFFF;
             --color-background-2: rgba(255, 255, 255, 0.85);
+            --color-background-3: #EAEAEA;
             --color-text: #1C1C1C;
             --color-text-2: #616161;
             --color-icon: #1C1C1C;
@@ -26,6 +27,7 @@ const GlobalStyles = createGlobalStyle`
             --color-primary: #E63946;
             --color-background: #121212;
             --color-background-2: rgba(18, 18, 18, 0.85);
+            --color-background-3: #ffffff1e;
             --color-text: #EAEAEA;
             --color-text-2: #B0B0B0;
             --color-icon: #EAEAEA;

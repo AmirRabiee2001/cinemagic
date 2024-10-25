@@ -1,112 +1,154 @@
-import {
-  POPULAR_MOVIES_URL,
-  SEARCH_URL,
-  TOP_MOVIES_URL,
-  TITLE_INFO_URL,
-  MOVIE_RECOMMENDATIONS_URL,
-  DISCOVER_URL,
-} from "../utils/constants";
+import { IMDB_INFO_URL, options } from "../utils/constants";
 
-export async function getPopularMovies() {
-  const response = await fetch(`${POPULAR_MOVIES_URL}1`);
-  const data = await response.json();
+// Get IMDB id from TMDB id
+export async function getIMDBId(tmdbId, type) {
+  try {
+    const response = await fetch(`https://api.themoviedb.org/3/${type}/${tmdbId}/external_ids`, options);
 
-  const movieDetailPromises = data.imdbIds.map(async (id) => {
-    const movieResponse = await fetch(`${TITLE_INFO_URL}${id}`);
-    const movieData = await movieResponse.json();
-    return movieData;
-  });
-
-  const movieDetails = await Promise.all(movieDetailPromises);
-
-  return movieDetails;
+    const data = await response.json();
+    return data.imdb_id;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
 }
 
-export async function getTopMovies() {
-  const response = await fetch(`${TOP_MOVIES_URL}1`);
-  const data = await response.json();
+// Get IMDB Scraped info
+export async function getIMDBInfo(imdbId) {
+  try {
+    const response = await fetch(`${IMDB_INFO_URL}${imdbId}`);
+    const data = await response.json();
 
-  const movieDetailPromises = data.imdbIds.map(async (id) => {
-    const movieResponse = await fetch(`${TITLE_INFO_URL}${id}`);
-    const movieData = await movieResponse.json();
-    return movieData;
-  });
-
-  const movieDetails = await Promise.all(movieDetailPromises);
-
-  return movieDetails;
+    return data;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
 }
 
-export async function getDiscover(type, genre, yearStart, yearEnd, page = "1") {
-  const response = await fetch(
-    `${DISCOVER_URL}?type=${type}&genre=${genre}&yearStart=${yearStart}&yearEnd=${yearEnd}&page=${page}`
-  );
-  const data = await response.json();
-
-  const movieDetailPromises = data.imdbIds
-    .filter((id) => id !== null) // Filter out null ids
-    .map(async (id) => {
-      const movieResponse = await fetch(`${TITLE_INFO_URL}${id}`);
-      const movieData = await movieResponse.json();
-      return movieData;
-    });
-
-  const movieDetails = await Promise.all(movieDetailPromises);
-
-  return movieDetails;
-}
-
-export async function searchTitle(query) {
-  const response = await fetch(`${SEARCH_URL}${query}`);
-  const data = await response.json();
-
-  return data;
-}
-
-export async function getTitle(id) {
-  const response = await fetch(`${TITLE_INFO_URL}${id}`);
-  const data = await response.json();
-
-  return data;
-}
-
-export async function getMovieRecommendations(id) {
-  const tmdbInfoResponse = await fetch(`https://imdb-api.amir-rabiee2001.workers.dev/title/${id}/tmdbInfo`);
-  const tmdbInfo = await tmdbInfoResponse.json();
-
-  const recommendedMoviesResponse = await fetch(`${MOVIE_RECOMMENDATIONS_URL}${tmdbInfo.movie_results[0].id}`);
-  const recommendedMovies = await recommendedMoviesResponse.json();
-
-  // Fetch all movie details, using Promise.allSettled to handle failures gracefully
-  const movieDetailPromises = recommendedMovies.imdbIds.map(async (id) => {
-    try {
-      const movieResponse = await fetch(`${TITLE_INFO_URL}${id}`);
-      const movieData = await movieResponse.json();
-      return movieData;
-      // eslint-disable-next-line no-unused-vars
-    } catch (error) {
-      return null; // Return null if the request fails
+// Helper function to get IMDb data from TMDB result
+export async function getIMDbDataFromTMDB(tmdbResult, type) {
+  try {
+    // Get the IMDb ID from the TMDB ID
+    const imdbId = await getIMDBId(tmdbResult.id, type);
+    if (!imdbId) {
+      throw new Error("IMDb ID not found for TMDB result");
     }
-  });
+    // Get IMDb information using the retrieved IMDb ID
+    const imdbData = await getIMDBInfo(imdbId);
+    return imdbData;
+  } catch (error) {
+    console.log(error.message);
+    return null; // Return null if there's an error, so it can be handled later
+  }
+}
 
-  const movieResults = await Promise.allSettled(movieDetailPromises);
+// Get top_rated and popular lists for both movie and tv
+export async function getLists(type, page, list) {
+  try {
+    const response = await fetch(`https://api.themoviedb.org/3/${type}/${list}?language=en-US&page=${page}`, options);
+    const data = await response.json();
 
-  // Filter out only the fulfilled promises
-  const successfulMovies = movieResults
-    .filter((result) => result.status === "fulfilled" && result.value !== null)
-    .map((result) => result.value);
+    // Use TMDB results to get corresponding IMDb information
+    const imdbResults = await Promise.all(data.results.map((tmdbResult) => getIMDbDataFromTMDB(tmdbResult, type)));
 
-  return successfulMovies;
+    // Filter out any null results (i.e., failed fetches)
+    return imdbResults.filter((result) => result !== null);
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+}
+
+// Discover results with filters for both tv and movie
+export async function getDiscover(type, genre, yearStart, yearEnd, page = "1") {
+  try {
+    const response = await fetch(
+      `https://api.themoviedb.org/3/discover/${type}?include_adult=false&include_video=false&language=en-US&page=${page}&${
+        type === "movie" ? "release_date" : "first_air_date"
+      }.gte=${yearStart}-01-01&${
+        type === "movie" ? "release_date" : "first_air_date"
+      }.lte=${yearEnd}-01-01&sort_by=popularity.desc&with_genres=${genre}`,
+      options
+    );
+
+    const data = await response.json();
+
+    // Use TMDB results to get corresponding IMDb information
+    const imdbResults = await Promise.all(data.results.map((tmdbResult) => getIMDbDataFromTMDB(tmdbResult, type)));
+
+    // Filter out any null results
+    return imdbResults.filter((result) => result !== null);
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+}
+
+// Search a title
+export async function searchTitle(query) {
+  try {
+    const response = await fetch(`https://imdb-api.amir-rabiee2001.workers.dev/search?query=${query}`);
+
+    const data = await response.json();
+
+    return data.results;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+}
+
+// Get Recommendations for both tv and movie
+export async function getRecommendations(imdbId, type) {
+  try {
+    // Step 1: Convert IMDb ID to TMDB ID
+    const tmdbIdResponse = await fetch(`https://api.themoviedb.org/3/find/${imdbId}?external_source=imdb_id`, options);
+
+    const tmdbIdData = await tmdbIdResponse.json();
+
+    // Extract TMDB ID depending on the type (movie or tv)
+    const tmdbId = type === "movie" ? tmdbIdData.movie_results[0]?.id : tmdbIdData.tv_results[0]?.id;
+
+    if (!tmdbId) {
+      throw new Error("TMDB ID not found for the provided IMDb ID");
+    }
+
+    // Step 2: Use TMDB ID to get recommendations
+    const response = await fetch(
+      `https://api.themoviedb.org/3/${type}/${tmdbId}/recommendations?language=en-US&page=1`,
+      options
+    );
+
+    const data = await response.json();
+
+    // Step 3: Use TMDB results to get corresponding IMDb information
+    const imdbResults = await Promise.all(data.results.map((tmdbResult) => getIMDbDataFromTMDB(tmdbResult, type)));
+
+    // Filter out any null results
+    return imdbResults.filter((result) => result !== null);
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
 }
 
 export async function getBookmarkedTitles(bookmarks) {
-  const movieDetailPromises = bookmarks.map(async (bookmark) => {
-    const movieResponse = await fetch(`${TITLE_INFO_URL}${bookmark.imdb_id}`);
-    const movieData = await movieResponse.json();
-    return movieData;
+  const titleDetailPromises = bookmarks.map(async (bookmark) => {
+    const titleResponse = await fetch(IMDB_INFO_URL + bookmark.imdb_id);
+
+    const titleData = await titleResponse.json();
+    return titleData;
   });
 
-  const movieDetails = await Promise.all(movieDetailPromises);
+  const titleDetails = await Promise.all(titleDetailPromises);
 
-  return movieDetails;
+  return titleDetails;
+}
+
+export async function getSeriesEpisodes(id, selectedSeason) {
+  const response = await fetch(`${IMDB_INFO_URL}${id}/season/${selectedSeason}`);
+
+  const data = await response.json();
+  return data;
 }

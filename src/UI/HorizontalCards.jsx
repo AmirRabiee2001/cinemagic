@@ -5,7 +5,6 @@ import { Divider } from "../styles/Divider";
 const HorizontalScrollContainer = styled.div`
   width: 100%;
   padding: 2rem 0rem;
-  background-color: var(--color-header);
 `;
 
 const Label = styled.h3`
@@ -22,18 +21,23 @@ const MovieList = styled.div`
   scroll-behavior: smooth;
 
   &::-webkit-scrollbar {
-    display: none;
+    background-color: var(--color-background-3);
+    height: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary);
+    border-radius: 1rem;
+    cursor: pointer;
   }
 `;
 
-const HorizontalScroll = ({ movies, label }) => {
+const HorizontalCards = ({ movies, label }) => {
   return (
     <HorizontalScrollContainer>
       <Label>{label}</Label>
       <Divider width={"100%"} />
       <MovieList>
         {movies.map((movie) => {
-          if (movie.message) return;
           return <MovieCard key={movie.id} id={movie.id} title={movie.title} year={movie.year} image={movie.image} />;
         })}
       </MovieList>
@@ -41,4 +45,4 @@ const HorizontalScroll = ({ movies, label }) => {
   );
 };
 
-export default HorizontalScroll;
+export default HorizontalCards;
