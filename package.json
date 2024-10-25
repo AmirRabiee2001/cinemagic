@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.8.0",
   "type": "module",
-  "homepage": "https://amirrabiee2001.github.io/cinemagic",
+  "homepage": "https://amirrabiee2001.github.io/cinemagic/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
